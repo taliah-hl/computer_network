@@ -61,9 +61,12 @@ int main(int argc, char *argv[]){
     bzero(buffer, 512);
     strcpy(buffer, "Hi, I'm server 110062361");
     send(client_fd, buffer, strlen(buffer),0);
+    printf("Server sending: %s", buffer);
 
     //receive
     bzero(buffer, 512);
+    recv(client_fd, buffer, sizeof(buffer), 0);
+    printf("client: %s\n", buffer);
     recv(client_fd, buffer, sizeof(buffer), 0);
     printf("client: %s\n", buffer);
 
