@@ -54,22 +54,18 @@ int main(int argc, char *argv[]){
     printf("client sending : %s\n", buffer);
     send(sock_fd, buffer, strlen(buffer), 0);
     Segment s;
-    receivedata(sock_fd, &s);
-    myheadercreator(&s);
-    sendheader(sock_fd, s.header);
-
-
+   
     //send
-    // bzero(buffer, 512);
-    // strcpy(buffer, "hello world");
-    // printf("client sending : %s\n", buffer);
+    bzero(buffer, 512);
+    strcpy(buffer, "hello world");
+    printf("client sending : %s\n", buffer);
 
-    // send(sock_fd, buffer, strlen(buffer), 0);
+    send(sock_fd, buffer, strlen(buffer), 0);
 
     // //receive msg from server
-    // bzero(buffer, 512);
-    // recv(sock_fd, buffer, sizeof(buffer), 0);
-    // printf("%s\n", buffer);
+    bzero(buffer, 512);
+    recv(sock_fd, buffer, sizeof(buffer), 0);
+    printf("%s\n", buffer);
     
 
     close(sock_fd);
