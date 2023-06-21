@@ -62,3 +62,41 @@ int main() {
         perror("Fail to open");
         exit(1);
     }
+
+    /*----------------------------receive data--------------------------------*/
+    /*                                                                        */                                              
+    /* TODO: Receive data from the RDT server.                                */
+    /*       Each packet will be 20bytes TCP header + 1000bytes paylaod       */
+    /*       exclude the last one. (the payload may not be exactly 1000bytes) */
+    /*                                                                        */
+    /* TODO: Once you receive the packets, you should check whether it's      */                                                            
+    /*       corrupt or not (checksum) , and send the corresponding ack       */                                                  
+    /*       packet (also a char[20] ) back to the server.                    */
+    /*                                                                        */
+    /* TODO: fwrite the payload into a .jpg file, and check the picture.      */
+    /*                                                                        */                                              
+    /*----------------------------receive data--------------------------------*/
+
+
+
+    /*-------------------------Something important----------------------------*/
+    /* NOTE: TO make lab3 simple                                              */
+    /*                                                                        */                                              
+    /*       1. The SrcIP and DesIP are both 127.0.0.1,                       */
+    /*          Tcp header length will be 20byts, windowsize = 65535 bytes    */                                              
+    /*       2. The Handshake packets won't be corrupt.                       */
+    /*       3. The packet will only corrupt but not miss or be disordered.   */                                              
+    /*       4. Only the packets come from server may corrupt.(don't have to  */
+    /*          worry that the ack sent by client will corrupt.)              */
+    /*       5. We offer mychecksum() for you to verify the checksum, and     */
+    /*          don't forget to verify pseudoheader part.                     */
+    /*       6. Once server finish transmit the file, it will close the       */
+    /*          client socket.                                                */                                              
+    /*       7. You can adjust server by                                      */                                              
+    /*          ./server {timeout duration} {corrupt probability}             */                                              
+    /*                                                                        */                                              
+    /*-------------------------Something important----------------------------*/
+
+}
+
+
