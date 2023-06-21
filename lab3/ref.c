@@ -98,17 +98,45 @@ int main() {
     }
 
     /*----------------------------receive data--------------------------------*/
-    /*                                                                        */                                              
-    /* TODO: Receive data from the RDT server.                                */
-    /*       Each packet will be 20bytes TCP header + 1000bytes paylaod       */
-    /*       exclude the last one. (the payload may not be exactly 1000bytes) */
-    /*                                                                        */
-    /* TODO: Once you receive the packets, you should check whether it's      */                                                            
-    /*       corrupt or not (checksum) , and send the corresponding ack       */                                                  
-    /*       packet (also a char[20] ) back to the server.                    */
-    /*                                                                        */
-    /* TODO: fwrite the payload into a .jpg file, and check the picture.      */
-    /*                                                                        */                                              
+    while (1) {
+        // Receive packet
+        memset(i_buffer, 0, sizeof(i_buffer));
+        if (recvpacket(socket_fd, i_buffer, sizeof(i_buffer), &recvS, "client") == -1) {
+            printf("Failed to receive data packet\n");
+            close(socket_fd);
+            fclose(file);
+            exit(0);
+        }
+    
+        // Check for end of transmission
+        if (recvS.l4info.Flag == FIN) {
+            printf("Received FIN packet. Transmission complete.\n");
+            break;
+        }
+    
+        // Verify checksum
+        memcpy(sendS.pseudoheader, &recvS.l3info, sizeof(recvS.l3info));
+        memcpy(sendS.pseudoheader + sizeof(recvS.l3info), &recvS.l4info, sizeof(recvS.l4info));
+        if (mychecksum(sendS.pseudoheader, sizeof(sendS.pseudoheader)) != 0) {
+            printf("Corrupted packet received. Discarding...\n");
+            continue;
+        }
+    
+        // Send ACK
+        replyS(&sendS, recvS.l4info.AckNum, recvS.l4info.SeqNum + 1000, ACK);
+        if (sendpacket(socket_fd, o_buffer, sizeof(o_buffer), &sendS, "client", 0) == -1) {
+            printf("Failed to send ACK packet\n");
+            close(socket_fd);
+            fclose(file);
+            exit(0);
+        }
+
+    // Write payload to file
+    fwrite(recvS.payload, sizeof(char), recvS.l4info.WindowSize - 20, file);
+}
+
+fclose(file);
+                                    
     /*----------------------------receive data--------------------------------*/
 
 
