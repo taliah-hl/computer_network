@@ -27,54 +27,34 @@ int main() {
     /*---------------------------UDT SERVER-----------------------------------*/
 
     /*---------------------------3 way hand shake-----------------------------*/
-    char header[20] = {0}; // Initialize header to all zeros
-
-    // Set source and destination ports
-    int srcPort = rand() % 65536; // Random source port number
-    int destPort = 45525;
-    memcpy(header, &srcPort, sizeof(srcPort));
-    memcpy(header + sizeof(srcPort), &destPort, sizeof(destPort));
-
-    // Set sequence number and ACK number
-    int seqNum = 0;
-    int ackNum = 0;
-    memcpy(header + 8, &seqNum, sizeof(seqNum));
-    memcpy(header + 12, &ackNum, sizeof(ackNum));
-
-    // Set the SYN flag to initiate the handshake
-    int flags = 0x02; // SYN flag
-    memcpy(header + 13, &flags, sizeof(flags));
-
-    // Send the SYN packet to the server
-    if (send(socket_fd, header, sizeof(header), 0) == -1) {
-        printf("Failed to send SYN packet!\n");
+    char o_buffer[20]={0};
+    char i_buffer[1020]={0}; 
+    uint32_t currentSeg, currentAck;
+    uint16_t sPort, Dport;
+    currentSeg = rand[];
+    currentAck = 0;
+    sPort = (rand()%65535)+1;
+    Dport =  45525;
+    initS(&sendS, sPort, Dport);
+    replyS(&sendS, currentSeg, currentAck, SYN);
+    if(sendpacket(socket_fd, o_buffer, sizeof(o_buffer), &sendS. "client", 0)==-1){
+        printf("Failed to send SYN packet\n");
         close(socket_fd);
         exit(0);
     }
-
-    // Receive the SYN-ACK packet from the server
-    char synAckHeader[20] = {0};
-    if (recv(socket_fd, synAckHeader, sizeof(synAckHeader), 0) == -1) {
-        printf("Failed to receive SYN-ACK packet!\n");
+    if(recvpacket(socket_fd, i_buffer, sizeof(i_buffer), &recvS. "client")==-1){
+        printf("Failed to receive SYN-ACK packet\n");
         close(socket_fd);
         exit(0);
     }
+    currentSeg = recvS.l4info.AckNum;
+    currentAck = recvS.l4info.SeqNum +1;
 
-    // Extract the ACK number from the received packet
-    int receivedAckNum;
-    memcpy(&receivedAckNum, synAckHeader + 12, sizeof(receivedAckNum));
+    //to be continued...
 
-    // Set the ACK flag and ACK number to complete the handshake
-    flags = 0x10; // ACK flag
-    memcpy(header + 13, &flags, sizeof(flags));
-    memcpy(header + 12, &receivedAckNum, sizeof(receivedAckNum));
+    
 
-    // Send the final ACK packet to the server
-    if (send(socket_fd, header, sizeof(header), 0) == -1) {
-        printf("Failed to send ACK packet!\n");
-        close(socket_fd);
-        exit(0);
-    }
+
     /*---------------------------3 way hand shake-----------------------------*/
 
     FILE* file = fopen("received_image.jpg", "wb");
@@ -82,4 +62,3 @@ int main() {
         perror("Fail to open");
         exit(1);
     }
-
