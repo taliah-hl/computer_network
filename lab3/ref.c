@@ -28,6 +28,12 @@
 
     // Receive SYN-ACK packet
     Segment recvS;
+void replyS(Segment* segment, uint32_t segNum, uint32_t ackNum, uint32_t flags) {
+    segment->l4info.SeqNum = segNum;
+    segment->l4info.AckNum = ackNum;
+    segment->l4info.Flag = flags;
+}
+
     if (recvpacket(socket_fd, i_buffer, sizeof(i_buffer), &recvS, "client") == -1) {
         printf("Failed to receive SYN-ACK packet\n");
         close(socket_fd);
