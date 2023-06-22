@@ -1,5 +1,49 @@
 #include "header.h"
+#include <errno.h>
 #include <netinet/in.h>
+
+
+int recvpacket(int socket_fd, char* buffer, int buffer_len, Segment* segment, const char* role) {
+    // Receive packet from the socket
+    ssize_t num_bytes = recv(socket_fd, buffer, buffer_len, 0);
+    if (num_bytes == -1) {
+        perror("recv");
+        return -1;
+    } else if (num_bytes == 0) {
+        printf("Connection closed by the remote side\n");
+        return -1;
+    }
+
+    // Extract the received segment information
+    memcpy(segment->header, buffer, sizeof(segment->header));
+    memcpy(segment->payload, buffer + sizeof(segment->header), num_bytes - sizeof(segment->header));
+    segment->p_len = num_bytes - sizeof(segment->header);
+
+    // Extract the header fields from the segment
+    memcpy(&(segment->l4info), segment->header, sizeof(segment->l4info));
+    memcpy(&(segment->l3info), segment->header + sizeof(segment->l4info), sizeof(segment->l3info));
+
+    return 0;
+}
+
+int sendpacket(int socket_fd, char* buffer, int buffer_len, Segment* segment, const char* role, int flag) {
+    // Construct the segment header
+    memcpy(segment->header, &(segment->l4info), sizeof(segment->l4info));
+    memcpy(segment->header + sizeof(segment->l4info), &(segment->l3info), sizeof(segment->l3info));
+
+    // Construct the complete packet
+    memcpy(buffer, segment->header, sizeof(segment->header));
+    memcpy(buffer + sizeof(segment->header), segment->payload, segment->p_len);
+
+    // Send the packet through the socket
+    ssize_t num_bytes = send(socket_fd, buffer, buffer_len, 0);
+    if (num_bytes == -1) {
+        perror("send");
+        return -1;
+    }
+
+    return 0;
+}
 
 void initS(Segment *sendS, uint16_t sPort, uint16_t Dport,uint32_t currentSeg, uint32_t currentAck){
     sendS->l4info.SourcePort = sPort;
